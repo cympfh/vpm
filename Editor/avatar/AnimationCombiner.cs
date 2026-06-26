@@ -219,7 +219,15 @@ public class AnimationCombiner : EditorWindow
         string animPath = EditorUtility.SaveFilePanelInProject("結合したAnimationClipを保存", saveName, "anim", "Combined animation clip", folder);
         if (string.IsNullOrEmpty(animPath)) return;
 
-        AssetDatabase.CreateAsset(newClip, animPath);
+        var existing = AssetDatabase.LoadAssetAtPath<AnimationClip>(animPath);
+        if (existing != null)
+        {
+            EditorUtility.CopySerialized(newClip, existing);
+        }
+        else
+        {
+            AssetDatabase.CreateAsset(newClip, animPath);
+        }
         AssetDatabase.SaveAssets();
 
         // メタ情報JSON出力
