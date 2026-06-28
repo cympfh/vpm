@@ -4,12 +4,15 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
+using UnityEditorInternal;
 
 public class AnimationCombiner : EditorWindow
 {
     private List<AnimationClip> clips = new List<AnimationClip>();
+    private ReorderableList reorderableList;
     private float intervalSeconds = 1f;
     private string saveName = "CombinedAnimation";
+    private Vector2 scrollPos;
 
     [Serializable]
     private class CombinedAnimationMeta
@@ -25,41 +28,70 @@ public class AnimationCombiner : EditorWindow
         window.Show();
     }
 
+    private void OnEnable()
+    {
+        BuildReorderableList();
+    }
+
+    private void BuildReorderableList()
+    {
+        reorderableList = new ReorderableList(clips, typeof(AnimationClip), true, true, true, true);
+
+        reorderableList.drawHeaderCallback = rect =>
+            EditorGUI.LabelField(rect, "AnimationClips（ドラッグで並べ替え可）");
+
+        reorderableList.drawElementCallback = (rect, index, isActive, isFocused) =>
+        {
+            rect.y += 2;
+            rect.height = EditorGUIUtility.singleLineHeight;
+            float labelWidth = 60f;
+            EditorGUI.LabelField(new Rect(rect.x, rect.y, labelWidth, rect.height), $"Clip {index + 1}");
+            clips[index] = (AnimationClip)EditorGUI.ObjectField(
+                new Rect(rect.x + labelWidth, rect.y, rect.width - labelWidth, rect.height),
+                clips[index], typeof(AnimationClip), false);
+        };
+
+        reorderableList.onAddCallback = list => clips.Add(null);
+        reorderableList.onRemoveCallback = list =>
+        {
+            if (list.index >= 0 && list.index < clips.Count)
+                clips.RemoveAt(list.index);
+        };
+    }
+
     private void OnGUI()
     {
-        EditorGUILayout.LabelField("結合するAnimationClipを順番に指定してください", EditorStyles.boldLabel);
-        EditorGUILayout.HelpBox("1番目 → 0秒開始\n2番目 → 1秒開始\n…と自動で配置されます", MessageType.Info);
+        scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+
+        EditorGUILayout.HelpBox("1番目 → 0秒開始\n2番目 → 間隔秒開始\n…と自動で配置されます", MessageType.Info);
 
         // D&Dエリア
-        EditorGUILayout.LabelField("または _meta.json をここにドラッグ＆ドロップ", EditorStyles.boldLabel);
-        Rect dropArea = GUILayoutUtility.GetRect(0, 70, GUILayout.ExpandWidth(true));
-        GUI.Box(dropArea, "ここに _meta.json をドロップ\n（クリップリストと間隔が自動復元されます）");
+        Rect dropArea = GUILayoutUtility.GetRect(0, 50, GUILayout.ExpandWidth(true));
+        GUI.Box(dropArea, "_meta.json をここにドロップ（クリップリストと間隔を復元）");
         HandleJsonDragAndDrop(dropArea);
 
-        for (int i = 0; i < clips.Count; i++)
-        {
-            clips[i] = (AnimationClip)EditorGUILayout.ObjectField($"Clip {i + 1}", clips[i], typeof(AnimationClip), false);
-        }
+        EditorGUILayout.Space(4);
 
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("＋ クリップを追加"))
-            clips.Add(null);
-        if (GUILayout.Button("－ 最後を削除") && clips.Count > 0)
-            clips.RemoveAt(clips.Count - 1);
-        EditorGUILayout.EndHorizontal();
+        if (reorderableList == null) BuildReorderableList();
+        reorderableList.DoLayoutList();
 
         intervalSeconds = EditorGUILayout.FloatField("間隔（秒）", intervalSeconds);
         saveName = EditorGUILayout.TextField("新しいClipの名前", saveName);
+
+        EditorGUILayout.Space(4);
 
         if (GUILayout.Button("結合して新しいAnimationClipを作成", GUILayout.Height(40)))
         {
             if (clips.Count == 0 || clips.Any(c => c == null))
             {
                 EditorUtility.DisplayDialog("エラー", "すべてのクリップを正しく指定してください", "OK");
+                EditorGUILayout.EndScrollView();
                 return;
             }
             CreateCombinedClip();
         }
+
+        EditorGUILayout.EndScrollView();
     }
 
     private void HandleJsonDragAndDrop(Rect dropArea)
@@ -105,8 +137,8 @@ public class AnimationCombiner : EditorWindow
                     Debug.LogWarning($"クリップが見つかりませんでした: {path}");
             }
             intervalSeconds = meta.intervalSeconds;
-
-            EditorUtility.DisplayDialog("ロード成功", $"クリップ {clips.Count}個 と間隔を復元しました", "OK");
+            BuildReorderableList();
+            // EditorUtility.DisplayDialog("ロード成功", $"クリップ {clips.Count}個 と間隔を復元しました", "OK");
         }
         catch (Exception ex)
         {
@@ -247,6 +279,6 @@ public class AnimationCombiner : EditorWindow
         EditorUtility.FocusProjectWindow();
         Selection.activeObject = newClip;
         Debug.Log($"結合完了！\n.anim → {animPath}\n_meta.json → {metaPath}");
-        EditorUtility.DisplayDialog("成功", $"新しいAnimationClipとメタJSONを作成しました\nマテリアル変更アニメーションも完全に保持されています！", "OK");
+        EditorUtility.DisplayDialog("成功", $"新しいAnimationClipとメタJSONを作成しました", "OK");
     }
 }
