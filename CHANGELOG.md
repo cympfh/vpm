@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-03
+
+### Added
+- Assertion コンポーネント（`Runtime/Assertion.cs`, `Editor/common/AssertionEditor.cs`, `Editor/common/AssertionBuildValidator.cs`）— GameObject の active/inactive、ParentConstraint の設定漏れなどの条件を登録し、VRChat ビルド開始時に自動検証。違反があればビルドを中止する。`IEditorOnly` によりビルド後は自動的に除去される
+- `package.json` の `vpmDependencies` に `com.vrchat.base` を追加（ビルドフック利用のため）
+
+(git commit: f3853be)
+
 ## [1.0.2] - 2026-07-03
 
 ### Changed
