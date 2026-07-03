@@ -34,10 +34,11 @@ jobs:
 
           mkdir -p build/payload
           cp -r Editor build/payload/Editor
+          cp -r Runtime build/payload/Runtime
           cp README.md LICENSE build/payload/
           jq --arg url "$DOWNLOAD_URL" '. + {url: $url}' package.json > build/payload/package.json
 
-          (cd build/payload && zip -r "$GITHUB_WORKSPACE/$ZIP_NAME" package.json README.md LICENSE Editor)
+          (cd build/payload && zip -r "$GITHUB_WORKSPACE/$ZIP_NAME" package.json README.md LICENSE Editor Runtime)
 
           cp build/payload/package.json build/package.json
           echo "ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"

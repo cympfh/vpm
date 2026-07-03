@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-07-03
+
+### Fixed
+- `release.yml` のビルドペイロードに `Runtime/` が含まれておらず、`Assertion` コンポーネントを含む配布物で `AssertionEditor.cs` がコンパイルエラーになる問題を修正
+
 ## [1.1.0] - 2026-07-03
 
 ### Added
