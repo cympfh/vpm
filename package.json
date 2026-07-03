@@ -10,5 +10,7 @@
     "url": "https://github.com/cympfh"
   },
   "license": "MIT",
-  "vpmDependencies": {}
+  "vpmDependencies": {
+    "com.vrchat.base": ">=3.4.0"
+  }
 }
