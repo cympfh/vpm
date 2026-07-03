@@ -16,8 +16,9 @@ concurrency:
 
 env:
   LISTING_BASE_URL: https://cympfh.cc/vpm
-  REPO_ID: cc.cympfh.vrchat-scripts.listing
-  REPO_NAME: "cympfh VPM Repository"
+  REPO_ID: cc.cympfh.vpm
+  REPO_NAME: cympfh
+  AUTHOR: cympfh
 
 jobs:
   build-listing:
@@ -65,7 +66,7 @@ jobs:
             --arg name "$REPO_NAME" \
             --arg id "$REPO_ID" \
             --arg url "${LISTING_BASE_URL}/index.json" \
-            --argjson author '{"name":"cympfh","email":"cympfh@gmail.com","url":"https://github.com/cympfh"}' \
+            --arg author "$AUTHOR" \
             --argjson packages "$PACKAGES_JSON" \
             '{name:$name, id:$id, url:$url, author:$author, packages:$packages}' \
             > dist/index.json

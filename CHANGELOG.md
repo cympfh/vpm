@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-07-03
+
+### Changed
+- README のコンテンツ構成を見直し、インストール手順のコードブロックを整理
+
+(git commit: 36f4b24)
+
+## [1.0.1] - 2026-07-03
+
+### Fixed
+- VPMリスティングのURLを `vpm.cympfh.cc` から `cympfh.cc/vpm` に修正
+
+(git commit: 2b6d6c4)
+
 ## [1.0.0] - 2026-07-03
 
 ### Added
