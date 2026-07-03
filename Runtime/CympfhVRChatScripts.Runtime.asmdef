@@ -1,17 +1,15 @@
 {
-    "name": "CympfhVRChatScripts.Editor",
-    "rootNamespace": "CympfhVRChatScripts.Editor",
+    "name": "CympfhVRChatScripts.Runtime",
+    "rootNamespace": "CympfhVRChatScripts.Runtime",
     "references": [
-        "CympfhVRChatScripts.Runtime"
+        "VRC.SDKBase"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": false,
+    "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false
