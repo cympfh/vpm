@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - `release.yml` のビルドペイロードに `Runtime/` が含まれておらず、`Assertion` コンポーネントを含む配布物で `AssertionEditor.cs` がコンパイルエラーになる問題を修正
 
+(git commit: c4f09be)
+
 ## [1.1.0] - 2026-07-03
 
 ### Added
