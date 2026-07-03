@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-07-03
+
+### Fixed
+- `Editor/` を asmdef 化した際に `Runtime/Assertion.cs` が暗黙のデフォルトアセンブリに残っていたため `AssertionEditor.cs` からコンパイルエラーになっていた問題を修正。`Runtime/` にも `CympfhVRChatScripts.Runtime.asmdef` を追加し、`Editor.asmdef` から明示的に参照する構成に変更
+- 両 asmdef の `overrideReferences` が `true` になっており、precompiled DLL（`VRCSDKBase(-Editor).dll`）の自動参照が無効化されて `VRC.SDKBase.IEditorOnly` が解決できない問題を修正（`false` に変更）
+
+(git commit: 57bca0f)
+
 ## [1.1.1] - 2026-07-03
 
 ### Fixed
