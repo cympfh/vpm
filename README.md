@@ -18,8 +18,8 @@ Editor/
 
 VPM リポジトリとして配布しています。以下のいずれかの方法で VCC (VRChat Creator Companion) / ALCOM に追加してください。
 
-- ワンクリックで追加: [`vcc://vpm/addRepo?url=https://vpm.cympfh.cc/index.json`](vcc://vpm/addRepo?url=https://vpm.cympfh.cc/index.json)
-- 手動で追加: VCC/ALCOM の Settings > Packages > Add Repository に `https://vpm.cympfh.cc/index.json` を入力
+- ワンクリックで追加: [`vcc://vpm/addRepo?url=https://cympfh.cc/vpm/index.json`](vcc://vpm/addRepo?url=https://cympfh.cc/vpm/index.json)
+- 手動で追加: VCC/ALCOM の Settings > Packages > Add Repository に `https://cympfh.cc/vpm/index.json` を入力
 
 追加後、プロジェクトの Manage Packages から `cympfh's VRChat Editor Scripts` をインストールできます。
 

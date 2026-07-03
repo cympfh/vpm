@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CUSTOM_DOMAIN: vpm.cympfh.cc
+  LISTING_BASE_URL: https://cympfh.cc/vpm
   REPO_ID: cc.cympfh.vrchat-scripts.listing
   REPO_NAME: "cympfh VPM Repository"
 
@@ -64,13 +64,11 @@ jobs:
           jq -n \
             --arg name "$REPO_NAME" \
             --arg id "$REPO_ID" \
-            --arg url "https://${CUSTOM_DOMAIN}/index.json" \
+            --arg url "${LISTING_BASE_URL}/index.json" \
             --argjson author '{"name":"cympfh","email":"cympfh@gmail.com","url":"https://github.com/cympfh"}' \
             --argjson packages "$PACKAGES_JSON" \
             '{name:$name, id:$id, url:$url, author:$author, packages:$packages}' \
             > dist/index.json
-
-          echo "$CUSTOM_DOMAIN" > dist/CNAME
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
