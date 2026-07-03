@@ -1,0 +1,85 @@
+name: Build Listing
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+env:
+  CUSTOM_DOMAIN: vpm.cympfh.cc
+  REPO_ID: cc.cympfh.vrchat-scripts.listing
+  REPO_NAME: "cympfh VPM Repository"
+
+jobs:
+  build-listing:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build index.json
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          mkdir -p dist work
+          PACKAGES_JSON='{}'
+
+          gh release list --repo "$GITHUB_REPOSITORY" \
+            --json tagName,isDraft --jq '.[] | select(.isDraft==false) | .tagName' \
+            > tags.txt
+
+          while IFS= read -r TAG; do
+            [ -z "$TAG" ] && continue
+            mkdir -p "work/$TAG"
+            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+              --pattern "package.json" --dir "work/$TAG" --clobber
+            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+              --pattern "*.zip" --dir "work/$TAG" --clobber
+
+            MANIFEST="$(cat "work/$TAG/package.json")"
+            NAME="$(echo "$MANIFEST" | jq -r .name)"
+            VERSION="$(echo "$MANIFEST" | jq -r .version)"
+            ZIP_FILE="$(ls work/"$TAG"/*.zip)"
+            SHA256="$(sha256sum "$ZIP_FILE" | cut -d' ' -f1)"
+
+            ENTRY="$(echo "$MANIFEST" | jq --arg sha "$SHA256" '. + {zipSHA256: $sha}')"
+
+            PACKAGES_JSON="$(echo "$PACKAGES_JSON" | jq \
+              --arg name "$NAME" --arg ver "$VERSION" --argjson entry "$ENTRY" \
+              '.[$name].versions[$ver] = $entry')"
+          done < tags.txt
+
+          jq -n \
+            --arg name "$REPO_NAME" \
+            --arg id "$REPO_ID" \
+            --arg url "https://${CUSTOM_DOMAIN}/index.json" \
+            --argjson author '{"name":"cympfh","email":"cympfh@gmail.com","url":"https://github.com/cympfh"}' \
+            --argjson packages "$PACKAGES_JSON" \
+            '{name:$name, id:$id, url:$url, author:$author, packages:$packages}' \
+            > dist/index.json
+
+          echo "$CUSTOM_DOMAIN" > dist/CNAME
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

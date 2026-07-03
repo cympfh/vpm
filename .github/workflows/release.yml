@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify tag matches package.json version
+        run: |
+          set -eu
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PKG_VERSION="$(jq -r .version package.json)"
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "::error::tag ($TAG_VERSION) != package.json version ($PKG_VERSION)"
+            exit 1
+          fi
+          echo "VERSION=$PKG_VERSION" >> "$GITHUB_ENV"
+          echo "PKG_NAME=$(jq -r .name package.json)" >> "$GITHUB_ENV"
+
+      - name: Build release payload
+        run: |
+          set -eu
+          ZIP_NAME="${PKG_NAME}-${VERSION}.zip"
+          DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/${ZIP_NAME}"
+
+          mkdir -p build/payload
+          cp -r Editor build/payload/Editor
+          cp README.md LICENSE build/payload/
+          jq --arg url "$DOWNLOAD_URL" '. + {url: $url}' package.json > build/payload/package.json
+
+          (cd build/payload && zip -r "$GITHUB_WORKSPACE/$ZIP_NAME" package.json README.md LICENSE Editor)
+
+          cp build/payload/package.json build/package.json
+          echo "ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"
+
+      - name: Create GitHub Release (draft)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          draft: true
+          generate_release_notes: true
+          files: |
+            ${{ env.ZIP_NAME }}
+            build/package.json
