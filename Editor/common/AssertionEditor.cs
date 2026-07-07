@@ -65,6 +65,33 @@ public class AssertionEditor : Editor
     {
         serializedObject.Update();
         list.DoLayoutList();
+
+        if (GUILayout.Button("Recheck"))
+        {
+            Recheck();
+        }
+
         serializedObject.ApplyModifiedProperties();
+    }
+
+    private void Recheck()
+    {
+        var assertion = (Assertion)target;
+
+        foreach (var entry in assertion.entries)
+        {
+            if (assertion.Evaluate(entry, out var message))
+                continue;
+
+            if (entry.type == AssertionType.AllParentConstraintsValid)
+            {
+                foreach (var go in assertion.GetInvalidParentConstraintObjects())
+                    Debug.LogError($"[Assertion] ParentConstraint が未設定または無効です: '{go.name}'", go);
+            }
+            else
+            {
+                Debug.LogError($"[Assertion] {message}", entry.targetObject);
+            }
+        }
     }
 }
