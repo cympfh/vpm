@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-07
+
+### Added
+- `Editor/common/AssertionEditor.cs` — Assertions リストの直下に `Recheck` ボタンを追加。押下時に全 entry を再評価し、`AllParentConstraintsValid` が失敗している場合は原因の `GameObject` をそれぞれ `Debug.LogError`（context 指定）で個別出力する
+
+### Fixed
+- `AllParentConstraintsValid` がUnity標準の `ParentConstraint` しか検証しておらず、`VRCParentConstraint` のみを使うシーンでは常に評価成功となりビルドを止められなかった問題を修正。`VRCParentConstraint` の `Sources`（各 `SourceTransform` の null チェック）と `IsActive` も検証するよう `Runtime/Assertion.cs` に追加
+- `Editor/avatar/ParentConstraintChecker.cs` にも `VRCParentConstraint` の走査を追加し、`IsActive == false` のものをConsoleに出力するよう修正
+- `package.json` の `vpmDependencies` の `com.vrchat.base` 最小バージョンを `>=3.4.0` から `>=3.7.0`（VRC Constraints API 導入バージョン）に変更
+
+(git commit: 8afb6a0)
+
 ## [1.1.2] - 2026-07-03
 
 ### Fixed

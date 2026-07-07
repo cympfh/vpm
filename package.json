@@ -1,7 +1,7 @@
 {
   "name": "cc.cympfh.vrchat-scripts",
   "displayName": "cympfh's VRChat Editor Scripts",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "unity": "2022.3",
   "description": "VRChat アバター・ワールド制作用の Unity Editor スクリプト集",
   "author": {
